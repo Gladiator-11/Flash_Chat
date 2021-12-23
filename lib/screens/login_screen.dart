@@ -1,5 +1,6 @@
 import 'package:flash_chat/components/round_button.dart';
 import 'package:flash_chat/constants.dart';
+import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -49,7 +50,9 @@ class _LoginScreenState extends State<LoginScreen> {
             RoundButton(
               colour: Colors.blue,
               title: 'LogIn',
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, ChatScreen.id);
+              },
             ),
           ],
         ),
