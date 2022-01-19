@@ -1,8 +1,15 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash_chat/components/google_sign_in.dart';
+import 'package:flash_chat/screens/google_login.dart';
+
 import 'package:flash_chat/screens/login_screen.dart';
 import 'package:flash_chat/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/components/round_button.dart';
+import 'package:provider/provider.dart';
+
+import 'chat_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static String id = 'welcme_screen';
@@ -53,9 +60,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 Navigator.pushNamed(context, RegistrationScreen.id);
               },
             ),
+            RoundButton(
+              colour: Colors.grey,
+              title: 'Google Sign In',
+              onTap: () async {
+                final provider =
+                    Provider.of<googlesignin>(context, listen: false);
+                provider.googleLogin();
+              },
+            )
           ],
         ),
       ),
     );
   }
 }
+

@@ -1,3 +1,4 @@
+import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,15 +25,7 @@ class _ChatScreenState extends State<ChatScreen> {
     getCurrentUser();
   }
 
-  // CollectionReference _collectionReference =
-  //     FirebaseFirestore.instance.collection('messages');
-  // void getmessages() async {
-  //   QuerySnapshot querySnapshot = await _collectionReference.get();
-  //   for (var message in querySnapshot.docs.map((doc) => doc.data()).toList()) {
-  //     print(message);
-  //   }
-  // }
-
+ 
   void messagesStream() async {
     await for (var snapshot in _firestore.collection('messages').snapshots()) {
       for (var message in snapshot.docs) {
@@ -200,3 +193,4 @@ class MessageBubbleButton extends StatelessWidget {
     );
   }
 }
+

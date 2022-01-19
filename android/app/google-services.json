@@ -7,35 +7,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:330173932208:android:ed230e7d641aade0109175",
-        "android_client_info": {
-          "package_name": "co.Aakash.flash_chat"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "330173932208-h7fe6glunbmhgvcmqktrgfs3tch2cstg.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBhmxjUTlAX1W6v-NhjXjm54CRQXH4mGfM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "330173932208-h7fe6glunbmhgvcmqktrgfs3tch2cstg.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:330173932208:android:392cc8d844d9db55109175",
         "android_client_info": {
           "package_name": "com.aakash.flash_chat"
