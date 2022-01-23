@@ -1,14 +1,26 @@
+import 'package:flash_chat/screens/login_screen.dart';
 import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+import '../components/logout_button.dart';
 
 final _firestore = FirebaseFirestore.instance;
-late User loggedInUser;
+late String loggedInUseremail;
 
 class ChatScreen extends StatefulWidget {
   static String id = 'chatscreen';
+
+  final String name;
+  final String email;
+
+  ChatScreen({
+    required this.email,
+    required this.name,
+  });
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -25,7 +37,6 @@ class _ChatScreenState extends State<ChatScreen> {
     getCurrentUser();
   }
 
- 
   void messagesStream() async {
     await for (var snapshot in _firestore.collection('messages').snapshots()) {
       for (var message in snapshot.docs) {
@@ -36,10 +47,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void getCurrentUser() async {
     final user = await _auth.currentUser;
+
     try {
       if (user != null) {
-        loggedInUser = user;
-        print(loggedInUser.email);
+        loggedInUseremail = user.email.toString();
+        // print(loggedInUser.email);
+      } else {
+        loggedInUseremail = widget.email;
       }
     } catch (e) {
       print(e);
@@ -52,12 +66,40 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         leading: null,
         actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                _auth.signOut();
-                Navigator.pop(context);
-              }),
+          LogoutButton(
+            colour: Colors.white,
+            onTap: () {
+              showDialog(
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text('Logout'),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: [
+                        Text('Do you really want to Logout'),
+                        Text('Then Approve it'),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('No')),
+                    TextButton(
+                        onPressed: () {
+                          GoogleSignIn().signOut();
+                          _auth.signOut();
+                          Navigator.pushNamed(context, LoginScreen.id);
+                        },
+                        child: Text('Yes'))
+                  ],
+                ),
+                context: context,
+              );
+            },
+            title: 'Logout',
+          ),
         ],
         title: Text('⚡️Chat'),
         backgroundColor: Colors.lightBlueAccent,
@@ -67,6 +109,12 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            Center(
+                child: Text(
+              widget.name,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+            )),
+            Center(child: Text(widget.email)),
             MessageBubble(),
             Container(
               decoration: kMessageContainerDecoration,
@@ -87,7 +135,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         messageTextController.clear();
                         _firestore.collection('messages').add({
                           'text': messagetext,
-                          'sender': loggedInUser.email,
+                          'sender': loggedInUseremail,
                         });
                       },
                       child: Text(
@@ -123,7 +171,7 @@ class MessageBubble extends StatelessWidget {
           final messageText = message['text'];
           final messageSender = message['sender'];
 
-          final currentUser = loggedInUser.email;
+          final currentUser = loggedInUseremail;
 
           final messageWidget = MessageBubbleButton(
             text: messageText,
@@ -193,4 +241,3 @@ class MessageBubbleButton extends StatelessWidget {
     );
   }
 }
-
