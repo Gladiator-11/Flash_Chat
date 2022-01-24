@@ -1,14 +1,9 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flash_chat/components/google_sign_in.dart';
 
 import 'package:flash_chat/screens/login_screen.dart';
 import 'package:flash_chat/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/components/round_button.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:provider/provider.dart';
-import 'chat_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static String id = 'welcme_screen';

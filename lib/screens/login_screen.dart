@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/components/round_button.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:flash_chat/screens/chat_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -100,12 +101,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       print(user.displayName);
                       print(user.email);
 
-                      Navigator.push(context, MaterialPageRoute(builder: (_) {
-                        return ChatScreen(
-                          email: user!.email,
-                          name: user.displayName ?? 'no name',
-                        );
-                      }));
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) {
+                          return ChatScreen(
+                            email: user!.email,
+                            name: user.displayName ?? 'no name',
+                          );
+                        }),
+                        ModalRoute.withName('/'),
+                      );
                     },
                   )
                 ],

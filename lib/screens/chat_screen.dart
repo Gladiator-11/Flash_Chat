@@ -1,4 +1,3 @@
-import 'package:flash_chat/screens/login_screen.dart';
 import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
@@ -64,6 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         leading: null,
         actions: <Widget>[
           LogoutButton(
@@ -87,10 +87,13 @@ class _ChatScreenState extends State<ChatScreen> {
                         },
                         child: Text('No')),
                     TextButton(
-                        onPressed: () {
-                          GoogleSignIn().signOut();
-                          _auth.signOut();
-                          Navigator.pushNamed(context, LoginScreen.id);
+                        onPressed: () async {
+                          await GoogleSignIn().signOut();
+                          await _auth.signOut();
+                          Navigator.pushAndRemoveUntil(context,
+                              MaterialPageRoute(builder: (_) {
+                            return WelcomeScreen();
+                          }), ModalRoute.withName(WelcomeScreen.id));
                         },
                         child: Text('Yes'))
                   ],
