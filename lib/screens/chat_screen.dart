@@ -4,7 +4,7 @@ import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../components/logout_button.dart';
 
 final _firestore = FirebaseFirestore.instance;
@@ -16,10 +16,10 @@ class ChatScreen extends StatefulWidget {
   final String name;
   final String email;
 
-  ChatScreen({
-    required this.email,
-    required this.name,
-  });
+  ChatScreen(
+    this.email,
+    this.name,
+  );
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -46,6 +46,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void getCurrentUser() async {
     final user = await _auth.currentUser;
+    final String email;
+    final String name;
 
     try {
       if (user != null) {
@@ -56,6 +58,15 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     } catch (e) {
       print(e);
+    }
+    email = loggedInUseremail;
+    name = widget.name;
+
+    if (loggedInUseremail != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('isloggedin', true);
+      prefs.setString('email', email);
+      prefs.setString('name', name);
     }
   }
 
@@ -90,6 +101,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         onPressed: () async {
                           await GoogleSignIn().signOut();
                           await _auth.signOut();
+                          SharedPreferences preferences = await SharedPreferences.getInstance();
+                          await preferences.clear();
                           Navigator.pushAndRemoveUntil(context,
                               MaterialPageRoute(builder: (_) {
                             return WelcomeScreen();

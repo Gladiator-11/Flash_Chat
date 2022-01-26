@@ -19,8 +19,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (user != null) {
       Navigator.push(context, MaterialPageRoute(builder: (_) {
         return ChatScreen(
-          email: email,
-          name: password,
+          email,
+          password,
         );
       }));
     } else {
@@ -37,92 +37,94 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Container(
-                    height: 200.0,
-                    child: Image.asset('images/logo.png'),
-                  ),
-                  SizedBox(
-                    height: 48.0,
-                  ),
-                  TextField(
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.emailAddress,
-                    onChanged: (value) {
-                      email = value;
-                    },
-                    decoration: kTextFieldDecoration.copyWith(
-                        hintText: 'Enter Your Email'),
-                  ),
-                  SizedBox(
-                    height: 8.0,
-                  ),
-                  TextField(
-                    textAlign: TextAlign.center,
-                    obscureText: true,
-                    onChanged: (value) {
-                      password = value;
-                    },
-                    decoration: kTextFieldDecoration.copyWith(
-                        hintText: 'Enter Your Password'),
-                  ),
-                  SizedBox(
-                    height: 24.0,
-                  ),
-                  RoundButton(
-                    colour: Colors.blue,
-                    title: 'LogIn',
-                    onTap: () async {
-                      setState(() {
-                        showSpinner = true;
-                      });
-                      authentication();
+        child: SingleChildScrollView(
+          child: Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Container(
+                      height: 200.0,
+                      child: Image.asset('images/logo.png'),
+                    ),
+                    SizedBox(
+                      height: 48.0,
+                    ),
+                    TextField(
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (value) {
+                        email = value;
+                      },
+                      decoration: kTextFieldDecoration.copyWith(
+                          hintText: 'Enter Your Email'),
+                    ),
+                    SizedBox(
+                      height: 8.0,
+                    ),
+                    TextField(
+                      textAlign: TextAlign.center,
+                      obscureText: true,
+                      onChanged: (value) {
+                        password = value;
+                      },
+                      decoration: kTextFieldDecoration.copyWith(
+                          hintText: 'Enter Your Password'),
+                    ),
+                    SizedBox(
+                      height: 24.0,
+                    ),
+                    RoundButton(
+                      colour: Colors.blue,
+                      title: 'LogIn',
+                      onTap: () async {
+                        setState(() {
+                          showSpinner = true;
+                        });
+                        authentication();
 
-                      setState(() {
-                        showSpinner = false;
-                      });
-                    },
-                  ),
-                  RoundButton(
-                    colour: Colors.grey,
-                    title: 'Google Sign In',
-                    onTap: () async {
-                      GoogleSignInAccount? user;
-                      final googleUser = await GoogleSignIn().signIn();
-                      if (googleUser == null) return;
-                      user = googleUser;
-                      print(user.displayName);
-                      print(user.email);
+                        setState(() {
+                          showSpinner = false;
+                        });
+                      },
+                    ),
+                    RoundButton(
+                      colour: Colors.grey,
+                      title: 'Google Sign In',
+                      onTap: () async {
+                        GoogleSignInAccount? user;
+                        final googleUser = await GoogleSignIn().signIn();
+                        if (googleUser == null) return;
+                        user = googleUser;
+                        print(user.displayName);
+                        print(user.email);
 
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (_) {
-                          return ChatScreen(
-                            email: user!.email,
-                            name: user.displayName ?? 'no name',
-                          );
-                        }),
-                        ModalRoute.withName('/'),
-                      );
-                    },
-                  )
-                ],
-              ),
-            ),
-            if (showSpinner)
-              Center(
-                child: CircularProgressIndicator(
-                  color: Colors.amber,
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (_) {
+                            return ChatScreen(
+                              user!.email,
+                              user.displayName ?? 'no name',
+                            );
+                          }),
+                          ModalRoute.withName('/'),
+                        );
+                      },
+                    )
+                  ],
                 ),
-              )
-          ],
+              ),
+              if (showSpinner)
+                Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.amber,
+                  ),
+                )
+            ],
+          ),
         ),
       ),
     );
