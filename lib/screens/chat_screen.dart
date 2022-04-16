@@ -1,13 +1,25 @@
+import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../components/logout_button.dart';
 
 final _firestore = FirebaseFirestore.instance;
-late User loggedInUser;
+late String loggedInUseremail;
 
 class ChatScreen extends StatefulWidget {
   static String id = 'chatscreen';
+
+  final String name;
+  final String email;
+
+  ChatScreen(
+    this.email,
+    this.name,
+  );
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -24,15 +36,6 @@ class _ChatScreenState extends State<ChatScreen> {
     getCurrentUser();
   }
 
-  // CollectionReference _collectionReference =
-  //     FirebaseFirestore.instance.collection('messages');
-  // void getmessages() async {
-  //   QuerySnapshot querySnapshot = await _collectionReference.get();
-  //   for (var message in querySnapshot.docs.map((doc) => doc.data()).toList()) {
-  //     print(message);
-  //   }
-  // }
-
   void messagesStream() async {
     await for (var snapshot in _firestore.collection('messages').snapshots()) {
       for (var message in snapshot.docs) {
@@ -43,13 +46,27 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void getCurrentUser() async {
     final user = await _auth.currentUser;
+    final String email;
+    final String name;
+
     try {
       if (user != null) {
-        loggedInUser = user;
-        print(loggedInUser.email);
+        loggedInUseremail = user.email.toString();
+        // print(loggedInUser.email);
+      } else {
+        loggedInUseremail = widget.email;
       }
     } catch (e) {
       print(e);
+    }
+    email = loggedInUseremail;
+    name = widget.name;
+
+    if (loggedInUseremail != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('isloggedin', true);
+      prefs.setString('email', email);
+      prefs.setString('name', name);
     }
   }
 
@@ -57,15 +74,48 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         leading: null,
         actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                messagesStream();
-                // _auth.signOut();
-                // Navigator.pop(context);
-              }),
+          LogoutButton(
+            colour: Colors.white,
+            onTap: () {
+              showDialog(
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text('Logout'),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: [
+                        Text('Do you really want to Logout'),
+                        Text('Then Approve it'),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('No')),
+                    TextButton(
+                        onPressed: () async {
+                          await GoogleSignIn().signOut();
+                          await _auth.signOut();
+                          SharedPreferences preferences = await SharedPreferences.getInstance();
+                          await preferences.clear();
+                          Navigator.pushAndRemoveUntil(context,
+                              MaterialPageRoute(builder: (_) {
+                            return WelcomeScreen();
+                          }), ModalRoute.withName(WelcomeScreen.id));
+                        },
+                        child: Text('Yes'))
+                  ],
+                ),
+                context: context,
+              );
+            },
+            title: 'Logout',
+          ),
         ],
         title: Text('⚡️Chat'),
         backgroundColor: Colors.lightBlueAccent,
@@ -75,6 +125,12 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            Center(
+                child: Text(
+              widget.name,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+            )),
+            Center(child: Text(widget.email)),
             MessageBubble(),
             Container(
               decoration: kMessageContainerDecoration,
@@ -95,7 +151,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         messageTextController.clear();
                         _firestore.collection('messages').add({
                           'text': messagetext,
-                          'sender': loggedInUser.email,
+                          'sender': loggedInUseremail,
                         });
                       },
                       child: Text(
@@ -131,7 +187,7 @@ class MessageBubble extends StatelessWidget {
           final messageText = message['text'];
           final messageSender = message['sender'];
 
-          final currentUser = loggedInUser.email;
+          final currentUser = loggedInUseremail;
 
           final messageWidget = MessageBubbleButton(
             text: messageText,
